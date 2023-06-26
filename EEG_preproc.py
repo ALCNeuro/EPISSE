@@ -52,8 +52,8 @@ demo_path = f"{root_path}/CGC_Pilots/Demographics"
 
 recording_dates = cfg.recording_dates
 
-for d, date in enumerate(recording_dates) :
-    files = glob.glob(f"{raw_path}/*{recording_dates[d]}*/UNFILTERED*.edf")
+for d, date in enumerate(gong_dates) :
+    files = glob.glob(f"{raw_path}/*{gong_dates[d]}*/UNFILTERED*.edf")
     start_dates_strings = [
         datetime.datetime.strptime(file.split('/')[-1][19:-5], 
         "%Y.%m.%d-%H.%M.%S").strftime("%Y.%m.%d-%H_%M_%S") for file in files

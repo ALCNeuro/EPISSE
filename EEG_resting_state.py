@@ -6,7 +6,6 @@ Created on 140623
 @author: Arthur_LC
 
 EEG_resting_state.py
-
 """
 
 # %%% Paths & Packages
@@ -26,7 +25,6 @@ behav_path = f"{root_path}/CGC_Pilots/Behav"
 demo_path = f"{root_path}/CGC_Pilots/Demographics"
 fig_path = f"{root_path}/CGC_Pilots/Figs"
 
-
 # %%% Script
 
 all_dates = cfg.recording_dates
@@ -36,8 +34,6 @@ alfredo_dates = cfg.alfredo_dates
 250523 : 1048 - 1054 | second one ???
 010623 : 1029 ? | second one ??? -> last one always?
 070623 : 102x ? 
-    
-    
 """
 RS_0 = [
     f"{preproc_path}/Session_1_recording_2_2023.05.25-10_39_38.edf",
@@ -66,6 +62,7 @@ cait_dictch = {
     'E1_C3': 'C3',
     'E1_O1': 'O1' 
         }
+
 jona = ["E2"]
 jona_ch = [
     'E2_O2','E2_C4','E2_F4','E2_Fz','E2_F3','E2_C3','E2_O1'
