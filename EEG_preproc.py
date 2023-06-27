@@ -51,6 +51,7 @@ demo_path = f"{root_path}/CGC_Pilots/Demographics"
 # %%% Script
 
 recording_dates = cfg.recording_dates
+gong_dates = cfg.gong_dates
 
 for d, date in enumerate(gong_dates) :
     files = glob.glob(f"{raw_path}/*{gong_dates[d]}*/UNFILTERED*.edf")

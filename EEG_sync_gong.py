@@ -119,18 +119,18 @@ for d, date in enumerate(gong_dates) :
         E1_raw.rename_channels(E1_dictch)
         E1_raw.set_montage("standard_1020")
         E1_raw.annotations.rename({"Gong" : E1_SRS.iloc[i].Mindstate})
-        savename = f"{preproc_path}/{sorted_files[recording_index].split('/')[-1][:-4]}_E1_ID_{ids_date.E1_ID.iloc[0]}_MS_Annot.edf"
+        savename = f"{preproc_path}/{sorted_files[recording_index].split('/')[-1][:-4]}_E1_ID_{ids_date.E1_ID.iloc[0]}_Probe_{i}_MS_Annot.edf"
         mne.export.export_raw(
-            savename, raw, fmt='edf', overwrite=True
+            savename, E1_raw, fmt='edf', overwrite=True
             )
         
         E2_raw = raw.copy().pick(E2_ch)
         E2_raw.rename_channels(E2_dictch)
         E2_raw.set_montage("standard_1020")
         E2_raw.annotations.rename({"Gong" : E2_SRS.iloc[i].Mindstate})
-        savename = f"{preproc_path}/{sorted_files[recording_index].split('/')[-1][:-4]}_E2_ID_{ids_date.E2_ID.iloc[0]}_MS_Annot.edf"
+        savename = f"{preproc_path}/{sorted_files[recording_index].split('/')[-1][:-4]}_E2_ID_{ids_date.E2_ID.iloc[0]}_Probe_{i}_MS_Annot.edf"
         mne.export.export_raw(
-            savename, raw, fmt='edf', overwrite=True
+            savename, E2_raw, fmt='edf', overwrite=True
             )
         
     print(f"\n... File were processed, split and saved for date : {date}")
