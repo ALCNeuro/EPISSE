@@ -347,6 +347,8 @@ for couple in couples :
     ax2.set_title("PTP")
     ax3.set_title("D_Slope")
     fig.suptitle(f"{couple[0]}>{couple[1]}")
+    
+    plt.savefig(f"{fig_path}/topo_sw_{couple[0]}_{couple[1]}.png", dpi = 500)
 
 # %% unpaired t-test no DT MW - ON PTP
 
