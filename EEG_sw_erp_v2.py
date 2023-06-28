@@ -22,13 +22,21 @@ from datetime import date
 from datetime import datetime
 todaydate = date.today().strftime("%d%m%y")
 
-root_path = cfg.root_DDE
+import os
+
+if "julissa" in os.getcwd() :
+    root_path = '/Users/julissadelossantos/Desktop/EPISSE'
+else:
+    root_path = cfg.root_DDE
+
+
 raw_path = f"{root_path}/CGC_Pilots/Raw"
 preproc_path = f"{root_path}/CGC_Pilots/Preproc"
 behav_path = f"{root_path}/CGC_Pilots/Behav"
 psychopy_path = f"{root_path}/CGC_Pilots/Psychopy"
 demo_path = f"{root_path}/CGC_Pilots/Demographics"
 fig_path = f"{root_path}/CGC_Pilots/Figs"
+
 
 # %% Variables
 
@@ -73,8 +81,10 @@ fmt_eve = "%d", "%d", "%d"
 
 channels = cfg.channels
 
+#list of file paths
 files = glob.glob(f"{preproc_path}/*_concat_raw.fif")
 
+# No such file id_recording_dates.csv in demographics**
 id_recording = pd.read_csv(
     f"{demo_path}/id_recording_dates.csv",
     delimiter = ";",
@@ -82,6 +92,7 @@ id_recording = pd.read_csv(
     )
 
 # %% Script
+#loop that iterates over files
 
 for file in files :
     sub_id = file[len(preproc_path):][-20:-15]
