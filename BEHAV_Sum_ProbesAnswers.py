@@ -13,8 +13,14 @@ import glob
 import matplotlib.pyplot as plt, seaborn as sns
 import config as cfg
 import sys
+import os
 
-root_path = cfg.root_DDE
+if "julissa" in os.getcwd() :
+    root_path = '/Users/julissadelossantos/Desktop/EPISSE'
+elif "arthur" in os.getcwd() :
+    root_path = cfg.root_DDE
+# for every sript
+    
 raw_path = f"{root_path}/CGC_Pilots/Raw"
 preproc_path = f"{root_path}/CGC_Pilots/Preproc"
 behav_path = f"{root_path}/CGC_Pilots/Behav"

@@ -25,25 +25,42 @@ import glob
 import numpy as np, pandas as pd
 from autoreject import get_rejection_threshold
 import config as cfg
-
+import os
+    
 from datetime import date
 todaydate = date.today().strftime("%d%m%y")
 
-DataType = cfg.DataType
-local = cfg.local
 
-if local : 
-    local_root_path = "/Users/arthurlecoz/Library/Mobile Documents/com~apple~CloudDocs/Desktop/A_Thesis/2023/Expe/EPISSE"
-root_path = local_root_path + "/" + DataType
-raw_path = root_path + "/labmeet_mock/Raw"
-preproc_path = root_path + "/labmeet_mock/Preproc"
-fig_path = root_path + "/labmeet_mock/Figs"
+if "julissa" in os.getcwd() :
+    root_path = '/Users/julissadelossantos/Desktop/EPISSE'
+    raw_path = root_path + "/CGC_Pilots/Raw"
+    preproc_path = root_path + "/CGC_Pilots/Preproc"
+    fig_path = root_path + "/CGC_Pilots/Figs"
+
+
+
+elif "arthur" in os.getcwd() :
+    DataType = cfg.DataType
+    local = cfg.local
+    
+    if local : 
+        local_root_path = "/Users/arthurlecoz/Library/Mobile Documents/com~apple~CloudDocs/Desktop/A_Thesis/2023/Expe/EPISSE"
+    root_path = local_root_path + "/" + DataType
+    
+    raw_path = root_path + "/labmeet_mock/Raw"
+    preproc_path = root_path + "/labmeet_mock/Preproc"
+    fig_path = root_path + "/labmeet_mock/Figs"
 
 # %% Files
+if "julissa" in os.getcwd() :
+    files = glob.glob(raw_path + "/**/*.edf")
+    filtered_files = glob.glob(raw_path + "/**/FILTERED*.edf")
+    unfiltered_files = glob.glob(raw_path + "/**/UNFILTER*.edf")
 
-files = glob.glob(root_path + "/*labmeet*/**/*.edf")
-filtered_files = glob.glob(root_path + "/*labmeet*/**/FILTERED*.edf")
-unfiltered_files = glob.glob(root_path + "/*labmeet*/**/UNFILTER*.edf")
+elif "arthur" in os.getcwd() :
+    files = glob.glob(root_path + "/*labmeet*/**/*.edf")
+    filtered_files = glob.glob(root_path + "/*labmeet*/**/FILTERED*.edf")
+    unfiltered_files = glob.glob(root_path + "/*labmeet*/**/UNFILTER*.edf")
 
 # %%
 
@@ -210,43 +227,69 @@ import matplotlib.pyplot as plt
 
 dic_evoked = {}
 
-for i, channel in enumerate(channels) :
-    dic_evoked["evoked_" + channel] = epochs_clean["SW/" + channel].average(
+# <-----------    JULISSA 
+clean_channels = []
+
+for key in epochs_clean.event_id :
+    channel = key.split("/")[1]
+    clean_channels.append(channel)
+    dic_evoked["evoked_" + channel] = epochs_clean[key].average(
         picks = channel)
 
-# for key, value in dic_evoked.items():
-#     Chan = key[-2:]
-    
-#     value.plot(titles = Chan, ylim = dict(eeg=[-10, 16]))
 
-# Create subplots
-fig, ((ax1, ax2, ax3), 
-      (ax4, ax5, ax6), 
-      (ax7, ax8, ax9)) = plt.subplots(
-    nrows = 3, 
-    ncols = 3,
-    figsize = (16,12),
-    layout = 'tight'
-    )
-# Remove box & axis from ax1, ax4, ax9, ax12
-ax5.axis('off')
-ax8.axis('off')
+fig, axs = plt.subplots(nrows = len(dic_evoked),ncols = 1,
+                        figsize = (16,12),layout = 'tight')
 
-# Plot your data
-dic_evoked['evoked_E1_F3'].plot(
-    titles = "F3", axes = ax1)
-dic_evoked['evoked_E1_Fz'].plot(
-    titles = "Fz", axes = ax2)
-dic_evoked['evoked_E1_F4'].plot(
-    titles = "F4", axes = ax3)
-dic_evoked['evoked_E1_C3'].plot(
-    titles = "C3", axes = ax4)
-dic_evoked['evoked_E1_C4'].plot(
-    titles = "C4", axes = ax6)
-dic_evoked['evoked_E1_O1'].plot(
-    titles = "O1", axes = ax7)
-dic_evoked['evoked_E1_O2'].plot(
-    titles = "O2", axes = ax9)
+for i, key in enumerate(dic_evoked):
+
+    dic_evoked[key].plot(axes=axs[i], titles = clean_channels[i])
+
 
 fig_savename = preproc_path + "/swERP_id.png"
 fig.savefig(fig_savename, dpi=300)
+
+# ----------->
+
+
+# <-----------    ARTHUR
+
+# for i, channel in enumerate(channels) :
+#     dic_evoked["evoked_" + channel] = epochs_clean["SW/" + channel].average(
+#         picks = channel)
+
+# # for key, value in dic_evoked.items():
+# #     Chan = key[-2:]
+    
+# #     value.plot(titles = Chan, ylim = dict(eeg=[-10, 16]))
+
+# # Create subplots
+# fig, ((ax1, ax2, ax3), 
+#       (ax4, ax5, ax6), 
+#       (ax7, ax8, ax9)) = plt.subplots(
+#     nrows = 3, 
+#     ncols = 3,
+#     figsize = (16,12),
+#     layout = 'tight'
+#     )
+# # Remove box & axis from ax1, ax4, ax9, ax12
+# ax5.axis('off')
+# ax8.axis('off')
+
+# # Plot your data
+# dic_evoked['evoked_E1_F3'].plot(
+#     titles = "F3", axes = ax1)
+# dic_evoked['evoked_E1_Fz'].plot(
+#     titles = "Fz", axes = ax2)
+# dic_evoked['evoked_E1_F4'].plot(
+#     titles = "F4", axes = ax3)
+# dic_evoked['evoked_E1_C3'].plot(
+#     titles = "C3", axes = ax4)
+# dic_evoked['evoked_E1_C4'].plot(
+#     titles = "C4", axes = ax6)
+# dic_evoked['evoked_E1_O1'].plot(
+#     titles = "O1", axes = ax7)
+# dic_evoked['evoked_E1_O2'].plot(
+#     titles = "O2", axes = ax9)
+
+# fig_savename = preproc_path + "/swERP_id.png"
+# fig.savefig(fig_savename, dpi=300)
