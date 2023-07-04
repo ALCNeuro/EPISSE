@@ -68,7 +68,7 @@ for file in files :
         raw, 
         events, 
         event_id = temp_event_id, 
-        tmin = -60,
+        tmin = -10,
         tmax = 0,
         baseline = (None, None),
         preload = True,
