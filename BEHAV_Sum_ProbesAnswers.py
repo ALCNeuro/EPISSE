@@ -180,7 +180,8 @@ df_mindstate_date.to_csv(df_savename)
 
 import ptitprince as pt
 
-palette = ["#38b000","#ff9100","#6096ba"]
+# palette = ["#38b000","#ff9100","#6096ba"] # Thomas
+palette = ["#85ADE2","#7F69A5","#C35257"] # Julissa
 
 dx="mindstate"; dy="percentage"; ort="v"; pal = palette; sigma = .3
 order = ["ON", "MW", "MB"]
@@ -216,9 +217,68 @@ plt.show()
 savename = (f"{fig_path}/PerMindstate.png")
 plt.savefig(savename, dpi = 300)
 
+# %% MS fig Jules'Poster
+
+x = "mindstate"
+order = ["ON", "MW", "MB"]
+y = "percentage"
+data = df_mindstate
+
+import numpy as np
+
+fig, ax = plt.subplots(figsize = (5, 16), layout = 'constrained')
+
+sns.violinplot(
+    x = x, order = order, y = y,
+    palette=palette, data=df_mindstate, inner=None, ax=ax, cut = 1)
+
+sns.boxplot(
+    x = x, order = order, y = y,
+    palette=palette, data=df_mindstate, ax=ax,
+    width=.2, boxprops={'zorder': 2}, meanline = True)
+
+ax.set_title("Percentage of Mindstate")
+ax.set_xlabel("Mindstate")
+ax.set_ylabel("Percentage")
+ax.set_yticks((0, .2, .4, .6, .8, 1))
+
+plt.show()
+savename = (f"{fig_path}/Jules_PerMindstate.png")
+plt.savefig(savename, dpi = 300)
+
+# %% Vig fig Jules'Poster
+
+x = "Mindstate"
+order = ["ON", "MW", "MB"]
+y = "Vigilance"
+data = big_df
+
+import numpy as np
+
+fig, ax = plt.subplots(figsize = (5, 16), layout = 'constrained')
+
+sns.violinplot(
+    x = x, order = order, y = y,
+    palette=palette, data=big_df, inner=None, ax=ax, cut = 1)
+
+sns.boxplot(
+    x = x, order = order, y = y,
+    palette=palette, data=big_df, ax=ax,
+    width=.10, boxprops={'zorder': 2}, meanline = True)
+
+ax.set_title("Percentage of Mindstate")
+ax.set_xlabel("Mindstate")
+ax.set_ylabel("Vigilance")
+# ax.set_yticks((0, .2, .4, .6, .8, 1))
+
+plt.show()
+savename = (f"{fig_path}/Jules_Vig.png")
+plt.savefig(savename, dpi = 300)
+
+
 # %% MS - Date
 
-fig, ax = plt.subplots(figsize = (8,16))
+fig, ax = plt.subplots(figsize = (5, 16))
 sns.boxplot(
     data = df_mindstate_date, 
     x = 'mindstate',
@@ -246,12 +306,12 @@ dx="Mindstate"; dy="Vigilance"; ort="v"; pal = palette; sigma = .3
 order = ["ON", "MW", "MB"]
 f, ax = plt.subplots(figsize=(8, 16))
 
-ax=pt.half_violinplot( 
+ax= pt.half_violinplot( 
     x = dx, y = dy, data = big_df, 
     palette = pal, bw = sigma, cut = 0., 
     scale = "area", width = .6, inner = None, orient = ort)
 
-ax=sns.stripplot(
+ax= sns.stripplot(
     x = dx, y = dy, data = big_df, order = ["ON", "MW", "MB"],
     palette = pal, edgecolor = "white", size = 3, jitter = 1, 
     zorder = 0, orient = ort
