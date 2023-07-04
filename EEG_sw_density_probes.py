@@ -32,10 +32,7 @@ id_recording = pd.read_csv(
     delimiter = ";",
     dtype = {"date" : str, "E1_ID" : str, "E2_ID" : str}
     )
-
-# %% Functions
-
-
+gong_sess = cfg.gong_sessions
 
 # %% Script
 
@@ -46,12 +43,14 @@ channel_list = [] ; valnegpeak_list = []; valpospeak_list = []
 chan_list = [] ; subid_list = [] ; 
 probetype_list = [];
 nprobe_list = []
+session_list = []
 
 fatigue_list = []
 
 for file in glob.glob(f"{preproc_path}/*_concat_raw.fif") :
     sub_id = file[len(preproc_path):][-20:-15]
     recording_date = file[len(preproc_path):][-27:-21]
+    session = gong_sess[recording_date]
     raw = mne.io.read_raw_fif(file, preload = True, verbose = None)
     raw.annotations.delete(
         np.where(
@@ -181,6 +180,7 @@ for file in glob.glob(f"{preproc_path}/*_concat_raw.fif") :
                 probetype_list.append(probetype)
                 nprobe_list.append(n_probe)
                 subid_list.append(sub_id)
+                session_list.append(session)
                 
                 fatigue_list.append(fatigue)
         
@@ -198,7 +198,8 @@ df_swdensity = pd.DataFrame(
      "Density" : density_60s,
      "Mindstate" : probetype_list,
      "fatigue" : fatigue_list,
-     "nprobe" : nprobe_list
+     "nprobe" : nprobe_list,
+     "session" : session_list
      }
     )
 
