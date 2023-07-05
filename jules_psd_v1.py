@@ -10,16 +10,16 @@ jules_psd_v1.py
 """
 # %% Paths & Packages
 
-import pandas as pd, numpy as np, matplotlib.pyplot as plt
+import pandas as pd, numpy as np
 import mne, glob
 
 import config as cfg
 
-from scipy.io import loadmat
+# from scipy.io import loadmat
 from autoreject import get_rejection_threshold
 
 from datetime import date
-from datetime import datetime
+# from datetime import datetime
 todaydate = date.today().strftime("%d%m%y")
 
 import os
@@ -49,6 +49,12 @@ for file in files :
     sub_id = file[len(preproc_path):][-20:-15]
     recording_date = file[len(preproc_path):][-27:-21]
     
+    srs = pd.read_csv(
+        glob.glob(f"{behav_path}/*{recording_date}*ID*{sub_id[3:]}*.csv")[0],
+        delimiter = ";"
+        )
+    vigilance_l = list(srs.Vigilance)
+    
     print(f"\n... CURRENTLY PROCESSING {sub_id} ...")
 
     raw = mne.io.read_raw_fif(file, preload = True, verbose = None)
@@ -76,20 +82,26 @@ for file in files :
         flat = flat_criteria
         )
     
+    inversed_dic = {value : key for key, value in epochs.event_id.items()}
+    ms_l = [inversed_dic[value] for value in epochs.events[:,2]]
+    metavigilance_l = np.asarray(vigilance_l)[
+        np.where(np.isin(epochs.events[:,0], events))[0]
+        ]
+    
     nepoch_l = [i for i in range(len(epochs))]
     subid_l = [sub_id for i, stage in enumerate(nepoch_l)]
-    ms_l = list(mindstates)
     
     new_metadata = pd.DataFrame({
         "subid" : subid_l[:len(epochs.events)],
         "n_epoch" : nepoch_l[:len(epochs.events)],
-        "mindstate" : ms_l[:len(epochs.events)]
+        "mindstate" : ms_l[:len(epochs.events)],
+        "vigilance" : metavigilance_l
         })
     
     epochs.metadata = new_metadata
     
     # Saving epochs
-    epochs_savename = f"{preproc_path}/epochs_psd_MS_{sub_id}_{recording_date}_{todaydate}_epo.fif"
+    epochs_savename = f"{preproc_path}/epochs_psd_vig_{sub_id}_{recording_date}_{todaydate}_epo.fif"
     epochs.save(
         epochs_savename,
         overwrite = True

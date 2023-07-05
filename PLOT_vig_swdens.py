@@ -72,8 +72,8 @@ for recording_date in id_recording.date.unique() :
     zscore_swd = np.asarray(zscore(temp_swd_probe.Density, nan_policy = 'omit'))
     
     plt.figure()
-    plt.plot(zscore_vig, label = "Vigilance")
-    plt.plot(zscore_swd, label = "SW Density")
+    plt.plot(zscore_vig, label = "Vigilance", color = "#356574")
+    plt.plot(zscore_swd, label = "SW Density", color = "#6a329f")
     plt.legend()
     plt.ylabel("z-scored Vigilance & SW Density")
     plt.xlabel("Probe Number")
@@ -101,23 +101,15 @@ for recording_date in id_recording.date.unique() :
         ).mean()
     
     zscore_swd = np.asarray(zscore(temp_swd_probe.Density, nan_policy = 'omit'))
-    
+
     plt.figure()
-    plt.plot(zscore_vig, label = "Vigilance")
-    plt.plot(zscore_swd, label = "SW Density")
+    plt.plot(zscore_vig, label = "Vigilance", color = "#356574")
+    plt.plot(zscore_swd, label = "SW Density", color = "#6a329f")
     plt.legend()
     plt.ylabel("z-scored Vigilance & SW Density")
     plt.xlabel("Probe Number")
     plt.show(block = False)
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
     
     

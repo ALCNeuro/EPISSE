@@ -57,20 +57,26 @@ for date in gong_dates :
     df = pd.DataFrame(
         {f"Vig_ID{i+1}" : vigi for i, vigi in enumerate(vigi_list)}
         )
+    columns_to_drop = df.columns[df.nunique() == 1]
+
     correlation = df.corr()
     big_vigi.append(
         np.nanmean(
             correlation.values[np.triu_indices_from(correlation.values,1)]
             ))
+    df = df.drop(columns_to_drop, axis=1)
     
     kappa_scores = []
     num_subjects = len(ID_list)
     
     for i in range(num_subjects - 1):
+        mindstate_i = mindstate_list[i]
+        if len(set(mindstate_i)) == 1 :
+            continue
         for j in range(i + 1, num_subjects):
-            mindstate_i = mindstate_list[i]
             mindstate_j = mindstate_list[j]
-
+            if len(set(mindstate_j)) == 1 :
+                continue
             valid_indices = ~pd.isnull(mindstate_i) & ~pd.isnull(mindstate_j)
             mindstate_i_valid = mindstate_i[valid_indices]
             mindstate_j_valid = mindstate_j[valid_indices]
@@ -84,78 +90,34 @@ for date in gong_dates :
 
 print("Kappa scores for all session:", np.mean(agreement_scores))
 print("Vigi scores for all session:", np.mean(big_vigi))
-    
-    # df = pd.DataFrame({f"Mindstate_ID{i+1}": mindstate for i, mindstate in enumerate(mindstate_list)})
-    # df_cleaned = df.dropna()
-
-    # agreement = df_cleaned.apply(lambda x: kappa(x, df_cleaned.drop(x.name, axis=1)), axis=0)
-    # mean_agreement = np.nanmean(agreement)
-        
-    # temp_ms = []
-    # for i, ID_1 in enumerate(ID_list) :
-    #     ms_1 = list(df_list[i].Mindstate)
-    #     for j, ID_2 in enumerate(ID_list) :
-    #         if ID_2 != ID_1 :
-    #             ms_2 = list(df_list[j].Mindstate)
-    #             if sum(df_list[i].Mindstate.isna()) > 0 and sum(df_list[j].Mindstate.isna()) == 0 :
-    #                 nan_idx_1 = np.where(df_list[i].Mindstate.isna())[0][0]
-    #                 ms_1.pop(nan_idx_1)
-    #                 ms_2.pop(nan_idx_1)
-    #             elif sum(df_list[j].Mindstate.isna()) > 0 and sum(df_list[i].Mindstate.isna()) == 0 :
-    #                 nan_idx_2 = np.where(df_list[j].Mindstate.isna())[0][0]
-    #                 ms_1.pop(nan_idx_2)
-    #                 ms_2.pop(nan_idx_2)
-    #             elif sum(df_list[j].Mindstate.isna()) > 0 and sum(df_list[i].Mindstate.isna()) > 0 :
-    #                 nan_idx_1 = np.where(df_list[i].Mindstate.isna())[0][0]
-    #                 nan_idx_2 = np.where(df_list[j].Mindstate.isna())[0][0]
-    #                 combined_idx = list(set(nan_idx_1 + nan_idx_2))
-    #                 ms_1.pop(combined_idx)
-    #                 ms_2.pop(combined_idx)
-                
-    #             temp_ms.append(
-    #                 kappa(
-    #                     np.asarray(ms_1), 
-    #                     np.asarray(df_list[j].Mindstate.dropna())
-    #                     )
-    #                 )
-    # big_ms.append(np.nanmean(temp_ms))
-            
-            
             
 # %% 
 
-from sklearn.metrics import cohen_kappa_score
-import numpy as np
+fig, ax = plt.subplots()
 
-files = glob.glob(f"{behav_path}/*{date}*.csv")
-df_list = [pd.read_csv(file, delimiter=";") for file in files]
+sns.pointplot(
+    x = np.linspace(0, 6, 7),
+    y = big_vigi,
+    ax = ax,
+    color = "#356574"
+    )
+sns.pointplot(
+    x = np.linspace(0, 6, 7),
+    y = agreement_scores,
+    ax = ax,
+    color = "#050A0B"
+    )
 
-vigilance_ratings = []
-mindstate_ratings = []
+ax.set_yticks(
+    ticks = [-1, 0, 1],
+    labels = ["-1", "0", "1"]
+    )
+ax.set_ylabel("Agreement scores")
+ax.set_xticks(
+    ticks = np.linspace(0, 6, 7),
+    labels = [i for i in range(7)]
+    )
+ax.set_xlabel("Sessions")
 
-for df in df_list:
-    # Extract Vigilance and Mindstate columns
-    vigilance = df['Vigilance']
-    mindstate = df['Mindstate']
-
-    # Drop rows with NaN values in Vigilance or Mindstate
-    valid_indices = ~np.isnan(vigilance) & ~pd.isnull(mindstate)
-    vigilance_valid = vigilance[valid_indices]
-    mindstate_valid = mindstate[valid_indices]
-
-    vigilance_ratings.append(vigilance_valid)
-    mindstate_ratings.append(mindstate_valid)
-
-# Calculate agreement using Cohen's kappa
-vigilance_agreement = cohen_kappa_score(vigilance_ratings)
-mindstate_agreement = cohen_kappa_score(mindstate_ratings)
-
-print("Agreement for Vigilance ratings:", vigilance_agreement)
-print("Agreement for Mindstate ratings:", mindstate_agreement)
-
-            
-            
-            
           
             
- 
