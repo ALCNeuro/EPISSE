@@ -1,0 +1,72 @@
+---
+title: "LMM_NT1_SS.rmd"
+author: "Arthur.LC"
+date: "2/17/2022"
+output: html_document
+---
+
+Tu as deux stratégies possibles:
+*AIC ou BIC: plus c’est petit mieux c’est. (la différence entre les deux tient à la façon dont ils prennent en compte la complexité d’un modèle, BIC donnant plus de pénalité aux modèles complexes). Le problème de AIC/BIC c’est qu’il n’y a pas d’idée de significativité. Tu peux avoir deux modèles très proches mais avec tout de même une différence de BIC ou AIC même si les deux modèles sont à peu près équivalents. C’est donc très bien pour sélectionner le meilleur modèle mais ça te dit rien sur la significativité (pour cela tu peux faire des tests post-hocs).
+* LRT (likelihood ratio test): c’est un chi-test sur les résidus (donc la variance non expliquée par le modèle) qui te donne une idée de significativité. 
+
+```{r library}
+library(lme4)
+library(lmerTest)
+library(tidyverse)
+library(ggplot2)
+library(data.table)
+library(emmeans)
+```
+
+```{r}
+table <- read.table("/Volumes/DDE_ALC/PhD/EPISSE/CGC_Pilots/Figs/big_df_allsess.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+table$ID = as.factor(table$ID)
+table$date = as.factor(table$date)
+table$Mindstate = as.factor(table$Mindstate)
+table$n_probe = as.factor(table$n_probe)
+# table$fatigue = as.numeric(table$fatigue)
+
+# Create list to hold on the models
+# lmm_feat <- as.list(5:ncol(table))
+# names(lmm_feat) <- colnames(table)[5:67]
+
+```
+
+
+```{r }
+M0 <- lmer(Vigilance ~ 1 + (1 | ID), data = table, REML = FALSE)
+M1 <- lmer(Vigilance ~ 1 + Mindstate + (1 | ID), data = table, REML = FALSE)
+M2 <- lmer(Vigilance ~ 1 + Mindstate + n_probe + (1 | ID), data = table, REML = FALSE)
+M3 <- lmer(Vigilance ~ 1 + Mindstate * n_probe + (1 | ID), data = table, REML = FALSE)
+anova(M0, M1, M2, M3)
+```
+
+```{r }
+emmeans(M1, pairwise ~ Mindstate)
+# emmeans(M2, pairwise ~ mindstate | daytime)
+# emmeans(M2, pairwise ~ daytime | mindstate)
+```
+
+NOW ONTO THE MINDSTATES :
+```{r}
+table <- read.table("/Volumes/DDE_ALC/PhD/EPISSE/CGC_Pilots/Figs/df_per_mindstate_perdate.csv", header = TRUE, sep = ",", stringsAsFactors = FALSE)
+table$sub_id = as.factor(table$sub_id)
+table$date = as.factor(table$date)
+table$mindstate = as.factor(table$mindstate)
+```
+
+THIS ONE IS NOT WORKING 
+BECAUSE MINDSTATE & PERCENTAGE ARE KINDA THE SAME
+-> MAYBE THERE'S A BETTER WAY TO DO IT?
+```{r }
+M0 <- lmer(percentage ~ 1 + (1 | sub_id), data = table, REML = FALSE)
+M1 <- lmer(percentage ~ 1 + mindstate + (1 | sub_id), data = table, REML = FALSE)
+M2 <- lmer(percentage ~ 1 + mindstate + date (1 | sub_id), data = table, REML = FALSE)
+M3 <- lmer(percentage ~ 1 + mindstate * date + (1 | sub_id), data = table, REML = FALSE)
+anova(M0, M1)
+```
+```{r }
+emmeans(M1, pairwise ~ mindstate)
+# emmeans(M3, pairwise ~ mindstate | daytime)
+# emmeans(M2, pairwise ~ daytime | mindstate)
+```

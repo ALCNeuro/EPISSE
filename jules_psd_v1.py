@@ -58,6 +58,9 @@ for file in files :
     print(f"\n... CURRENTLY PROCESSING {sub_id} ...")
 
     raw = mne.io.read_raw_fif(file, preload = True, verbose = None)
+    
+    raw.plot(duration = 30, block = True)
+    
     raw.annotations.delete(
         np.where(
             (raw.annotations.description != 'ON')
@@ -76,13 +79,27 @@ for file in files :
         event_id = temp_event_id, 
         tmin = -10,
         tmax = 0,
-        baseline = (None, None),
+        baseline = None,
         preload = True,
-        reject = dict(eeg=500-6) ,
+        reject = dict(eeg=500e-6) ,
         flat = flat_criteria
         )
+    if len(epochs) == 0 :
+        continue
     
     inversed_dic = {value : key for key, value in epochs.event_id.items()}
+    
+    ms_in_epochs = np.unique([inversed_dic[ev] for ev in epochs.events[:,2]])
+    ms_in_event = [key for key, _ in epochs.event_id.items()]
+    
+    to_exclude = np.where(
+        np.logical_not(
+            np.isin(ms_in_event, ms_in_epochs)))[0]
+    
+    if len(to_exclude) > 0 :
+        for value in to_exclude :
+            epochs.event_id.pop(ms_in_event[value])
+    
     ms_l = [inversed_dic[value] for value in epochs.events[:,2]]
     metavigilance_l = np.asarray(vigilance_l)[
         np.where(np.isin(epochs.events[:,0], events))[0]

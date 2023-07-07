@@ -116,6 +116,7 @@ for file in files :
             & (raw.annotations.description != 'MB'))[0]
         )
     mindstates = raw.annotations.description
+    raw.plot(duration = 30, block = True)
     
     events, temp_event_id = mne.events_from_annotations(
         raw, event_id=dic_event)
@@ -127,11 +128,27 @@ for file in files :
         event_id = temp_event_id, 
         tmin = -10,
         tmax = 0,
-        baseline = (None, None),
+        baseline = None,
         preload = True,
         reject = None ,
         flat = flat_criteria
         )
+    
+    if len(epochs) == 0 :
+        continue
+    
+    inversed_dic = {value : key for key, value in epochs.event_id.items()}
+    
+    ms_in_epochs = np.unique([inversed_dic[ev] for ev in epochs.events[:,2]])
+    ms_in_event = [key for key, _ in epochs.event_id.items()]
+    
+    to_exclude = np.where(
+        np.logical_not(
+            np.isin(ms_in_event, ms_in_epochs)))[0]
+    
+    if len(to_exclude) > 0 :
+        for value in to_exclude :
+            epochs.event_id.pop(ms_in_event[value])
     
     epochs_highlowpass = epochs.copy().filter(1, None)
     
@@ -226,6 +243,7 @@ for file in files :
             & (raw.annotations.description != 'MW') 
             & (raw.annotations.description != 'MB'))[0]
         )
+    raw.plot(duration = 30, block = True)
     mindstates = raw.annotations.description
     
     events, temp_event_id = mne.events_from_annotations(
@@ -238,11 +256,27 @@ for file in files :
         event_id = temp_event_id, 
         tmin = -10,
         tmax = 0,
-        baseline = (None, None),
+        baseline = None,
         preload = True,
         reject = dict(eeg = 500e-6) ,
         flat = flat_criteria
         )
+    
+    if len(epochs) == 0 :
+        continue
+    
+    inversed_dic = {value : key for key, value in epochs.event_id.items()}
+    
+    ms_in_epochs = np.unique([inversed_dic[ev] for ev in epochs.events[:,2]])
+    ms_in_event = [key for key, _ in epochs.event_id.items()]
+    
+    to_exclude = np.where(
+        np.logical_not(
+            np.isin(ms_in_event, ms_in_epochs)))[0]
+    
+    if len(to_exclude) > 0 :
+        for value in to_exclude :
+            epochs.event_id.pop(ms_in_event[value])
     
     nepoch_l = [i for i in range(len(epochs))]
     subid_l = [sub_id for i, stage in enumerate(nepoch_l)]
@@ -283,11 +317,24 @@ df = pd.DataFrame(
 
 # plt.bar(df.session, df.keptper, ec = 'k')
 
+fig, ax = plt.subplots()
 sns.barplot(
     data = df, 
     x = "session", 
     y = "keptper",
-    linewidth = 0,
+    # linewidth = 0,
     palette = palette,
-    ec = 'k'
+    ax = ax, edgecolor='black', linewidth=1
     )
+# for bar in ax.patches:
+#     bar.set_edgecolor('black')
+
+ax.set_xticks(
+    ticks = [0, 1, 2, 3, 4, 5, 6],
+    labels = ["1","2","3","4","5","6","7"])
+ax.set_xlabel("Sessions")
+ax.set_yticks(
+    ticks = [0, 20, 40, 60, 80, 100],
+    labels = ["0", "20", "40", "60", "80", "100"]
+    )
+ax.set_ylabel("Percentage (in %)")

@@ -33,13 +33,15 @@ fig_dir = root_path+'/CGC_Pilots/Figs'
 channels = ["F3", "F4", "Fz", "C3", "C4", "O1", "O2"] # ?
 subtypes = ["ON", "MW", "MB"]
 #stages = ["WAKE", "N1", "N2", "N3", "REM"]
+dic_ms = {1 : 'ON', 2 : 'MW', 3 : 'MB'}
 
 big_dic = {subtype : [] for subtype in subtypes}
 
-for file in glob.glob(preproc_dir + "/epochs_psd_MS_*_epo.fif"):
+for file in glob.glob(preproc_dir + "/epochs_psd_vig_*0607*_epo.fif"):
     key = file.split('/')[-1].split('_')[2]
     epochs = mne.read_epochs(file, preload = True)
-    for subtype in epochs.metadata.mindstate.unique() :
+    ms_in_epochs = [dic_ms[ev] for ev in epochs.events[:,2]]
+    for subtype in np.unique(ms_in_epochs) :
         big_dic[subtype].append(np.mean(
             epochs[subtype].compute_psd(
                 method = "welch",
@@ -165,7 +167,7 @@ subtypes = ["low_vig", "high_vig"]
 
 big_dic = {subtype : [] for subtype in subtypes}
 
-for file in glob.glob(preproc_dir + "/epochs_psd_vig_*_epo.fif"):
+for file in glob.glob(preproc_dir + "/epochs_psd_vig_*0607*_epo.fif"):
     # key = file.split('/')[-1].split('_')[2]
     epochs = mne.read_epochs(file, preload = True)
     if len(epochs[epochs.metadata.vigilance < 3.5]) > 0 :
@@ -219,11 +221,11 @@ fig, ax = plt.subplots(
     # Loop through each population and plot its PSD and SEM
 for j, subtype in enumerate(subtypes):
     # Convert power to dB
-    psd_db = gaussian_filter(np.mean(dic_psd[subtype], axis = 0), 2)
+    psd_db = gaussian_filter(np.mean(dic_psd[subtype], axis = 0), 3)
     # psd_db = np.mean(dic_psd[subtype], axis = 0)
 
     # Calculate the SEM
-    sem_db = gaussian_filter(np.mean(dic_sem[subtype], axis = 0), 2)
+    sem_db = gaussian_filter(np.mean(dic_sem[subtype], axis = 0), 3)
     # sem_db = np.mean(dic_sem[subtype], axis = 0)
 
     # Plot the PSD and SEM
