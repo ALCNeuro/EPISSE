@@ -16,7 +16,7 @@ import mne, glob
 import config as cfg
 
 # from scipy.io import loadmat
-from autoreject import get_rejection_threshold
+# from autoreject import get_rejection_threshold
 
 from datetime import date
 # from datetime import datetime
@@ -59,7 +59,7 @@ for file in files :
 
     raw = mne.io.read_raw_fif(file, preload = True, verbose = None)
     
-    raw.plot(duration = 30, block = True)
+    # raw.plot(duration = 30, block = True)
     
     raw.annotations.delete(
         np.where(
@@ -81,9 +81,12 @@ for file in files :
         tmax = 0,
         baseline = None,
         preload = True,
-        reject = dict(eeg=500e-6) ,
+        reject = None ,
         flat = flat_criteria
         )
+    
+    epochs.plot(n_epochs = 3, block = True)
+    
     if len(epochs) == 0 :
         continue
     
@@ -118,7 +121,7 @@ for file in files :
     epochs.metadata = new_metadata
     
     # Saving epochs
-    epochs_savename = f"{preproc_path}/epochs_psd_vig_{sub_id}_{recording_date}_{todaydate}_epo.fif"
+    epochs_savename = f"{preproc_path}/POSTER_epochs_psd_vig_{sub_id}_{recording_date}_{todaydate}_epo.fif"
     epochs.save(
         epochs_savename,
         overwrite = True

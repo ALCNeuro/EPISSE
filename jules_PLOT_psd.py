@@ -30,14 +30,15 @@ fig_dir = root_path+'/CGC_Pilots/Figs'
 
 # %%
 
-channels = ["F3", "F4", "Fz", "C3", "C4", "O1", "O2"] # ?
+# channels = ["F3", "F4", "Fz", "C3", "C4", "O1", "O2"] # ?
+roi = ["O1", "O2"]
 subtypes = ["ON", "MW", "MB"]
 #stages = ["WAKE", "N1", "N2", "N3", "REM"]
 dic_ms = {1 : 'ON', 2 : 'MW', 3 : 'MB'}
 
 big_dic = {subtype : [] for subtype in subtypes}
 
-for file in glob.glob(preproc_dir + "/epochs_psd_vig_*0607*_epo.fif"):
+for file in glob.glob(preproc_dir + "/POSTER_epochs_psd_vig_*_epo.fif"):
     key = file.split('/')[-1].split('_')[2]
     epochs = mne.read_epochs(file, preload = True)
     ms_in_epochs = [dic_ms[ev] for ev in epochs.events[:,2]]
@@ -51,7 +52,7 @@ for file in glob.glob(preproc_dir + "/epochs_psd_vig_*0607*_epo.fif"):
                 n_overlap = 123,
                 n_per_seg = 256,
                 window = "hamming",
-                picks = channels
+                picks = roi
                 ),
              axis = 0))
 
